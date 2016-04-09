@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<config>
+  <kafka>
+    <zooKeeper>222.73.34.92:2181</zooKeeper>
+    <groupId>test-consumer-group</groupId>
+    <topic>hot_words_1</topic>
+    <timeOut>400</timeOut>
+    <syncTime>200</syncTime>
+    <autoCommit>1000</autoCommit>
+  </kafka>
+  <mail>
+    <smtpHost>smtp.mxhichina.com</smtpHost>
+    <smtpAuth>true</smtpAuth>
+    <sendMail>info@kunyan-inc.com</sendMail>
+    <passWord>kunyan@2015@</passWord>
+    <handleNum>3</handleNum>
+  </mail>
+  <thread>
+    <num>1</num>
+  </thread>
+</config>

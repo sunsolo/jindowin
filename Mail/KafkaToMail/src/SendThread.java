@@ -56,17 +56,12 @@ class SendThread implements Runnable {
         /**
          * 工作逻辑,根据自己需求修改
          * */
-        String test = new String(it.next().message());
-        System.out.println(test);
-        hotwords = (Map<String,String>)JSON.parse(test);
-        System.out.println(test);
+        hotwords = (Map<String,String>)JSON.parse(new String(it.next().message());
         String email = hotwords.get("email");
         String type = hotwords.get("type");
         String name = hotwords.get("name");
         String hot_words = hotwords.get("hot_words");
         String msgTemplate = "尊敬的用户:\n  您好！您订阅的" + type + "(\"" + name + "\")" + "有新的热词：" + hot_words + "增长";
-        System.out.println(test);
-        System.out.println(email);
 
         if(email == null) {
           System.out.println("The to or content is null");
@@ -119,7 +114,9 @@ class SendThread implements Runnable {
             System.out.println(connectInfo.getMessage());
             System.out.println("The connection is dead or not in the connected state");
             return;
-          }
+          } finally {
+            transportHandle.close();
+	  }
           reconnectNum++;
           continue;
         } else {

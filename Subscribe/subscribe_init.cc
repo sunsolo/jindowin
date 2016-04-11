@@ -57,7 +57,7 @@ static handler_t OnSubscribeMessage(struct server *srv, \
   ret = subscribe_logic::Subscribelogic::GetInstance()->OnSubscribeMessage(\
       srv, fd, data, len);
 
-  if(false == ret) {
+  if (false == ret) {
     return HANDLER_GO_ON;
   } else {
     return HANDLER_FINISHED;

@@ -2,9 +2,10 @@
 //  Created on: 2015/12/16 Author: Sunsolo
 
 #include "subscribe/subscribe_logic.h"
-#include <stdlib.h>
-#include <string>
 
+#include <stdlib.h>
+#include <map>
+#include <string>
 #include <sstream>
 
 #include "basic/basic_util.h"
@@ -13,6 +14,7 @@
 
 #include "subscribe/db_comm.h"
 #include "subscribe/redis_comm.h"
+
 namespace subscribe_logic {
 
   Subscribelogic* Subscribelogic::instance_ = NULL;
@@ -20,8 +22,8 @@ namespace subscribe_logic {
   std::map<std::string, std::string>* Subscribelogic::Stock_Code_Name_ = NULL;
 
   Subscribelogic::Subscribelogic() {
-    if (!Init()){
-      if(NULL != Stock_Code_Name_) {
+    if (!Init()) {
+      if (NULL != Stock_Code_Name_) {
         delete Stock_Code_Name_;
         Stock_Code_Name_ = NULL;
       }
@@ -34,7 +36,7 @@ namespace subscribe_logic {
     subscribesvc::DbSql::Dest();
     subscribesvc::DbRedis::Dest();
 
-    if(NULL != Stock_Code_Name_) {
+    if (NULL != Stock_Code_Name_) {
       delete Stock_Code_Name_;
       Stock_Code_Name_ = NULL;
     }
@@ -62,7 +64,7 @@ namespace subscribe_logic {
       subscribesvc::DbRedis::Init(&config->redis_list_);
 
       Stock_Code_Name_ = new std::map<std::string, std::string>();
-      if(NULL == Stock_Code_Name_) {
+      if (NULL == Stock_Code_Name_) {
         break;
       }
       ret = subscribesvc::DbSql::QueryStockCodeName(*Stock_Code_Name_);
@@ -110,7 +112,7 @@ namespace subscribe_logic {
       scoped_ptr<base_logic::ValueSerializer> serializer(\
           base_logic::ValueSerializer::Create(\
             base_logic::IMPL_HTTP, &http_str));
-      NetBase* value = (NetBase*)(\
+      NetBase* value = reinterpret_cast<NetBase*>(\
           serializer.get()->Deserialize(&error_code, &error_str));
 
       if (NULL == value) {
@@ -202,7 +204,8 @@ namespace subscribe_logic {
 
       scoped_ptr<netcomm_send::SendSection> all_section(\
           new netcomm_send::SendSection());
-      ret = subscribesvc::DbSql::QuerySection(recv_section->user_id(), all_section.get());
+      ret = subscribesvc::DbSql::QuerySection(
+          recv_section->user_id(), all_section.get());
       if (true == ret) {
         if (3 == json_type) {
           all_section->set_jsonp_callback(jsonp_str);
@@ -235,7 +238,8 @@ namespace subscribe_logic {
 
       scoped_ptr<netcomm_send::SendIndustry> all_industry(\
           new netcomm_send::SendIndustry());
-      ret = subscribesvc::DbSql::QueryIndustry(recv_industry->user_id(), all_industry.get());
+      ret = subscribesvc::DbSql::QueryIndustry(
+          recv_industry->user_id(), all_industry.get());
       if (true == ret) {
         if (3 == json_type) {
           all_industry->set_jsonp_callback(jsonp_str);
@@ -271,21 +275,22 @@ namespace subscribe_logic {
       std::map<std::string, std::string> top_stock;
       std::string stock_str = "";
 
-      ret = subscribesvc::DbRedis::GetStockInfo("-13", "-1", 0, top_stock);
-      if(false == ret) {
+      ret = subscribesvc::DbRedis::GetStockInfo("-21", "-1", 0, top_stock);
+      if (false == ret) {
         send_error(QUERY_REDIS_FAILED, socket, json_type, jsonp_str);
         break;
       }
       std::map<std::string, std::string>::iterator itr = top_stock.begin();
-      for(; itr != top_stock.end(); itr++) {
-        if(stock_str == "") {
+      for (; itr != top_stock.end(); itr++) {
+        if (stock_str == "") {
           stock_str = stock_str + itr->first;
         } else {
           stock_str = stock_str + "," + itr->first;
         }
       }
 
-      ret = subscribesvc::DbSql::QueryStock(recv_stock->user_id(), &stock_str, all_stock.get());
+      ret = subscribesvc::DbSql::QueryStock(
+          recv_stock->user_id(), &stock_str, all_stock.get());
       if (true == ret) {
         if (3 == json_type) {
           all_stock->set_jsonp_callback(jsonp_str);
@@ -331,7 +336,7 @@ namespace subscribe_logic {
         if (3 == json_type) {
           send_subscribe->set_jsonp_callback(jsonp_str);
         }
-        send_message(socket, (SendPacketBase*)(\
+        send_message(socket, reinterpret_cast<SendPacketBase*>(\
               send_subscribe.get()), json_type);
 
       } else {
@@ -370,7 +375,7 @@ namespace subscribe_logic {
         if (3 == json_type) {
           send_subscribe->set_jsonp_callback(jsonp_str);
         }
-        send_message(socket, (SendPacketBase*)(\
+        send_message(socket, reinterpret_cast<SendPacketBase*>(\
               send_subscribe.get()), json_type);
 
       } else {
@@ -399,7 +404,8 @@ namespace subscribe_logic {
       scoped_ptr<netcomm_send::SendAllSubscribe> all_subscribe(\
           new netcomm_send::SendAllSubscribe());
 
-      ret = subscribesvc::DbSql::QuerySubscribe(query_subscribe->user_id(), all_subscribe.get(), Stock_Code_Name_);
+      ret = subscribesvc::DbSql::QuerySubscribe(
+          query_subscribe->user_id(), all_subscribe.get(), Stock_Code_Name_);
       all_subscribe->set_result(ret);
       if (true == ret) {
         if (3 == json_type) {

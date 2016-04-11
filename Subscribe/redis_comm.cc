@@ -3,6 +3,7 @@
 #include "subscribe/redis_comm.h"
 
 #include <string>
+#include <map>
 
 #include "logic/logic_comm.h"
 #include "tools/tools.h"
@@ -38,7 +39,7 @@ base_storage::DictionaryStorageEngine* DbRedis::GetRedis() {
 }
 
 bool DbRedis::GetTopStockInfo(std::string* stock_name, double* visit_rate, \
-    double* search_rate, double* follow_rate){
+    double* search_rate, double* follow_rate) {
   base_storage::DictionaryStorageEngine* redis = DbRedis::GetRedis();
   bool ret = false;
 
@@ -47,39 +48,31 @@ bool DbRedis::GetTopStockInfo(std::string* stock_name, double* visit_rate, \
       break;
     }
 
-    int64 visit_count = 0, search_count = 0, follow_count = 0; 
+    int64 visit_count = 0, search_count = 0, follow_count = 0;
     int64 all_visit_count = 0, all_search_count = 0, all_follow_count = 0;
 
     std::string current_time = tools::GetTimeKey(time(NULL));
     current_time = current_time.substr(0, 10);
 
-    /*std::map<std::string, std::string> redis_stock;
-    ret = GetRedisStock(redis, 2, "-1", "-1", 0, current_time, redis_stock);
-    std::map<std::string, std::string>::iterator itr = redis_stock.begin();
-    if(redis_stock.end() == itr || false == ret) {
-      break;
-    }
-    *(stock_name) = itr->first;*/
-
     std::map<std::string, std::string> redis_stock;
     std::string is_del = "000001";
     ret = GetRedisStock(redis, 2, "-2", "-1", 0, current_time, redis_stock);
-    if(false == ret) {
+    if (false == ret) {
       break;
     }
     std::map<std::string, std::string>::iterator itr = redis_stock.begin();
-    for(; itr != redis_stock.end(); itr++) {
-      if(is_del == itr->first) {
+    for (; itr != redis_stock.end(); itr++) {
+      if (is_del == itr->first) {
         continue;
       }
 
-      if(visit_count < atol((itr->second).c_str())) {
+      if (visit_count < atol((itr->second).c_str())) {
         visit_count = atol((itr->second).c_str());
         *(stock_name) = itr->first;
       }
     }
 
-    if(0 == stock_name->size()) {
+    if (0 == stock_name->size()) {
       ret = false;
       break;
     }
@@ -90,30 +83,30 @@ bool DbRedis::GetTopStockInfo(std::string* stock_name, double* visit_rate, \
         *(stock_name), &all_visit_count, &visit_count);
     bool search_ret = GetStockProp(redis, 3, current_time, \
         *(stock_name), &all_search_count, &search_count);
-    if(false == follow_ret || false == visit_ret || false == search_ret) {
+    if (false == follow_ret || false == visit_ret || false == search_ret) {
       ret = false;
       break;
     }
 
-    if(0 == all_visit_count) {
+    if (0 == all_visit_count) {
       *visit_rate = 0.0;
     } else {
       *visit_rate = visit_count / (all_visit_count * 1.0);
     }
 
-    if(0 == all_follow_count) {
+    if (0 == all_follow_count) {
       *follow_rate = 0.0;
     } else {
       *follow_rate = follow_count / (all_follow_count * 1.0);
     }
 
-    if(0 == all_search_count) {
+    if (0 == all_search_count) {
       *search_rate = 0.0;
     } else {
       *search_rate = search_count / (all_search_count * 1.0);
     }
     ret = true;
-  }while(0);
+  } while (0);
 
   return ret;
 }
@@ -128,7 +121,7 @@ bool DbRedis::GetSingleStockInfo(std::string* stock_name, double* visit_rate, \
       break;
     }
 
-    int64 visit_count = 0, search_count = 0, follow_count = 0; 
+    int64 visit_count = 0, search_count = 0, follow_count = 0;
     int64 all_visit_count = 0, all_search_count = 0, all_follow_count = 0;
 
     std::string current_time = tools::GetTimeKey(time(NULL));
@@ -140,24 +133,24 @@ bool DbRedis::GetSingleStockInfo(std::string* stock_name, double* visit_rate, \
         *(stock_name), &all_visit_count, &visit_count);
     bool search_ret = GetStockProp(redis, 3, current_time, \
         *(stock_name), &all_search_count, &search_count);
-    if(false == follow_ret || false == visit_ret || false == search_ret) {
+    if (false == follow_ret || false == visit_ret || false == search_ret) {
       ret = false;
       break;
     }
 
-    if(0 == all_visit_count) {
+    if (0 == all_visit_count) {
       *visit_rate = 0.0;
     } else {
       *visit_rate = (visit_count / (all_visit_count * 1.0)) * 1000;
     }
 
-    if(0 == all_follow_count) {
+    if (0 == all_follow_count) {
       *follow_rate = 0.0;
     } else {
       *follow_rate = (follow_count / (all_follow_count * 1.0)) * 1000;
     }
 
-    if(0 == all_search_count) {
+    if (0 == all_search_count) {
       *search_rate = 0.0;
     } else {
       *search_rate = (search_count / (all_search_count * 1.0)) * 1000;
@@ -169,7 +162,7 @@ bool DbRedis::GetSingleStockInfo(std::string* stock_name, double* visit_rate, \
 }
 
 bool DbRedis::GetStockProp(base_storage::DictionaryStorageEngine* redis, \
-    int opt_type, const std::string& time, const std::string& stock_name,\
+    int opt_type, const std::string& time, const std::string& stock_name, \
     int64* all_count, int64* top_count) {
   bool ret = false;
 
@@ -177,12 +170,12 @@ bool DbRedis::GetStockProp(base_storage::DictionaryStorageEngine* redis, \
     std::map<std::string, std::string> redis_stock;
 
     ret = GetRedisStock(redis, opt_type, "0", "-1", 0, time, redis_stock);
-    if(false == ret) {
+    if (false == ret) {
       break;
     }
     std::map<std::string, std::string>::iterator itr = redis_stock.begin();
-    for(; itr != redis_stock.end(); itr++) {
-      if(itr->first == stock_name) {
+    for (; itr != redis_stock.end(); itr++) {
+      if (itr->first == stock_name) {
         *top_count = atol((itr->second).c_str());
       }
       *all_count = *all_count + atol((itr->second).c_str());
@@ -192,14 +185,18 @@ bool DbRedis::GetStockProp(base_storage::DictionaryStorageEngine* redis, \
   return ret;
 }
 
-bool DbRedis::GetRedisStock(base_storage::DictionaryStorageEngine* redis, int opt_type, \
-    const char* head, const char* tail, int order, const std::string& time,             \
+bool DbRedis::GetRedisStock(base_storage::DictionaryStorageEngine* redis,
+    int opt_type,
+    const char* head,
+    const char* tail,
+    int order,
+    const std::string& time,
     std::map<std::string, std::string>& stock_pro) {
   bool ret = false;
 
   do {
     std::string key_type = "";
-    switch(opt_type) {
+    switch (opt_type) {
       case FOLLOW_OPT:
         key_type += "follow:";
         break;
@@ -215,7 +212,8 @@ bool DbRedis::GetRedisStock(base_storage::DictionaryStorageEngine* redis, int op
     std::string key = std::string("set:") + key_type + time;
     int key_len = key.length();
 
-    ret = redis->GetSortedSet(key.c_str(), key_len, head, tail, order, stock_pro);
+    ret = redis->GetSortedSet(key.c_str(),
+        key_len, head, tail, order, stock_pro);
   }while(0);
   return ret;
 }
@@ -234,7 +232,8 @@ bool DbRedis::GetStockInfo(const char* head, const char* tail, int order, \
     std::string key = std::string("set:") + "visit:" + current_time;
     int key_len = key.length();
 
-    ret = redis->GetSortedSet(key.c_str(), key_len, head, tail, order, stock_info);
+    ret = redis->GetSortedSet(key.c_str(),
+        key_len, head, tail, order, stock_info);
   }while(0);
 
   return ret;

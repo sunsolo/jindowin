@@ -6,6 +6,9 @@
 
 #include <sstream>
 #include <string>
+#include <utility>
+#include <map>
+#include <vector>
 
 #include "basic/basic_util.h"
 #include "basic/scoped_ptr.h"
@@ -23,7 +26,8 @@ namespace subscribesvc {
     base_db::MysqlDBPool::Dest();
   }
 
-  bool DbSql::QuerySection(int64 user_id, netcomm_send::SendSection* all_section) {
+  bool DbSql::QuerySection(int64 user_id,
+      netcomm_send::SendSection* all_section) {
     bool ret = false;
 
     do {
@@ -49,17 +53,17 @@ namespace subscribesvc {
       LOG_DEBUG2("call function query_section():"\
           "The query num is [%d]", result_num);
       if (result_num > 0) {
-
         std::map<std::pair<std::string, int>, int> m;
         MYSQL_ROW rows;
         for (int i = 0; i < result_num; i++) {
           rows = *(reinterpret_cast<MYSQL_ROW*>(engine->FetchRows()->proc));
           std::string tmp = rows[0];
-          m.insert(std::make_pair(std::make_pair(tmp, atoi(rows[2])), atoi(rows[1])));
+          m.insert(std::make_pair(std::make_pair(tmp, atoi(rows[2])),
+                atoi(rows[1])));
         }
 
-        std::vector<std::pair<std::pair<std::string,int>, int> > vec(m.begin(),m.end());
-        for(int i = 0; i < 12; i++) {
+        std::vector<std::pair<std::pair<std::string, int>, int> > vec(m.begin(), m.end());
+        for (int i = 0; i < 12; i++) {
           scoped_ptr<base_logic::DictionaryValue> section(\
               new base_logic::DictionaryValue());
           scoped_ptr<base_logic::StringValue> gn_name(\
@@ -76,7 +80,8 @@ namespace subscribesvc {
     return ret;
   }
 
-  bool DbSql::QueryIndustry(int64 user_id, netcomm_send::SendIndustry* all_industry) {
+  bool DbSql::QueryIndustry(int64 user_id,
+      netcomm_send::SendIndustry* all_industry) {
     bool ret = false;
 
     do {
@@ -102,7 +107,6 @@ namespace subscribesvc {
       LOG_DEBUG2("call function query_industry():"\
           "The query num is [%d]", result_num);
       if (result_num > 0) {
-
         std::map<std::pair<std::string, int>, int> m;
         MYSQL_ROW rows;
         for (int i = 0; i < result_num; i++) {
@@ -111,8 +115,8 @@ namespace subscribesvc {
           m.insert(std::make_pair(std::make_pair(tmp, atoi(rows[2])), atoi(rows[1])));
         }
 
-        std::vector<std::pair<std::pair<std::string,int>, int> > vec(m.begin(),m.end());
-        for(int i = 0; i < 12; i++) {
+        std::vector<std::pair<std::pair<std::string, int>, int> > vec(m.begin(), m.end());
+        for (int i = 0; i < 12; i++) {
           scoped_ptr<base_logic::DictionaryValue> industry(\
               new base_logic::DictionaryValue());
           scoped_ptr<base_logic::StringValue> hy_name(\
@@ -129,7 +133,8 @@ namespace subscribesvc {
     return ret;
   }
 
-  bool DbSql::QueryStock(int64 user_id, std::string* stock_code, netcomm_send::SendStock* all_stock) {
+  bool DbSql::QueryStock(int64 user_id, std::string* stock_code,
+      netcomm_send::SendStock* all_stock) {
     bool ret = false;
 
     do {
@@ -141,7 +146,8 @@ namespace subscribesvc {
       }
 
       std::stringstream sql_lan;
-      sql_lan << "call proc_GetTopStockInfo(" << user_id << ",\'" << *stock_code << "\');";
+      sql_lan << "call proc_GetTopStockInfo(" << user_id << ",\'" <<
+        *stock_code << "\');";
       std::string sql_str = sql_lan.str();
       ret = engine->SQLExec(sql_str.c_str());
       if (false == ret) {
@@ -155,7 +161,6 @@ namespace subscribesvc {
       LOG_DEBUG2("call function query_industry():"\
           "The query num is [%d]", result_num);
       if (result_num > 0) {
-
         MYSQL_ROW rows;
         for (int i = 0; i < result_num; i++) {
           rows = *(reinterpret_cast<MYSQL_ROW*>(engine->FetchRows()->proc));
@@ -180,7 +185,8 @@ namespace subscribesvc {
     return ret;
   }
 
-  bool DbSql::QueryStockCodeName(std::map<std::string, std::string>& stock_code_name) {
+  bool DbSql::QueryStockCodeName(
+      std::map<std::string, std::string>& stock_code_name) {
     bool ret = false;
 
     do {
@@ -255,9 +261,7 @@ namespace subscribesvc {
             "errorkey:exec sql error");
         break;
       }
-
     }while(0);
-
     return ret;
   }
 
@@ -293,24 +297,23 @@ namespace subscribesvc {
             "errorkey:exec sql error");
         break;
       }
-
     }while(0);
 
     return ret;
   }
 
-  bool DbSql::QuerySubscribe(int64 user_id, 
+  bool DbSql::QuerySubscribe(int64 user_id,
       netcomm_send::SendAllSubscribe* all_subscribe,
       std::map<std::string, std::string>* stock_name) {
     bool ret = false;
 
     do {
       ret = QueryStockSubscribe(user_id, all_subscribe, stock_name);
-      if(ret == false) {
+      if (ret == false) {
         break;
       }
       ret = QuerySectionSubscribe(user_id, all_subscribe);
-      if(ret == false) {
+      if (ret == false) {
         break;
       }
       ret = QueryIndustrySubscribe(user_id, all_subscribe);
@@ -319,7 +322,8 @@ namespace subscribesvc {
     return ret;
   }
 
-  bool DbSql::QuerySectionSubscribe(int64 user_id, netcomm_send::SendAllSubscribe* all_subscribe) {
+  bool DbSql::QuerySectionSubscribe(int64 user_id,
+      netcomm_send::SendAllSubscribe* all_subscribe) {
     bool ret = false;
 
     do {
@@ -365,7 +369,7 @@ namespace subscribesvc {
     return ret;
   }
 
-  bool DbSql::QueryStockSubscribe(int64 user_id, 
+  bool DbSql::QueryStockSubscribe(int64 user_id,
       netcomm_send::SendAllSubscribe* all_subscribe,
       std::map<std::string, std::string>* name) {
     bool ret = false;
@@ -404,7 +408,7 @@ namespace subscribesvc {
             new base_logic::DictionaryValue());
         scoped_ptr<base_logic::StringValue> stock_code(\
             new base_logic::StringValue(rows[0]));
-        if(name->find(rows[0]) != itr) {
+        if (name->find(rows[0]) != itr) {
           scoped_ptr<base_logic::StringValue> stock_name(\
               new base_logic::StringValue((*name)[rows[0]]));
           stock->Set("stock_name", stock_name.release());
@@ -419,7 +423,8 @@ namespace subscribesvc {
     return ret;
   }
 
-  bool DbSql::QueryIndustrySubscribe(int64 user_id, netcomm_send::SendAllSubscribe* all_subscribe) {
+  bool DbSql::QueryIndustrySubscribe(int64 user_id,
+      netcomm_send::SendAllSubscribe* all_subscribe) {
     bool ret = false;
 
     do {

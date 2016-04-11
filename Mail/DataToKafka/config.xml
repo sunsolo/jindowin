@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<config>
+  <redis>
+    <host>222.73.34.96</host>
+    <port>6390</port>
+    <password>7ifW4i@M</password>
+    <timeout>5000</timeout>
+    <maxwait>5000</maxwait>
+    <brrowtest>true</brrowtest>
+  </redis>
+
+  <mysql>
+    <driver>com.mysql.jdbc.Driver</driver>
+    <url>jdbc:mysql://192.168.1.4:3306/jindowin</url>
+    <user>root</user>
+    <password>hadoop</password>
+    <minconn>1</minconn>
+    <maxconn>3</maxconn>
+    <partition>2</partition>
+  </mysql>
+  <kafka>
+    <broker>192.168.1.4:9092</broker>
+    <serializer>kafka.serializer.StringEncoder</serializer>
+    <partitioner>com.kunyan.wokongsvc.mail.NewPartitioner</partitioner>
+    <topic>wukun</topic>
+  </kafka>
+  <handle>
+    <num>4</num>
+  </handle>
+</config>

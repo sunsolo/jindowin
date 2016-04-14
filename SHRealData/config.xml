@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <mySql>
+    <url>jdbc:mysql://222.73.34.92:3306/stock</url>
+    <user>root</user>
+    <passWord>dataservice2015</passWord>
+  </mySql>
+  <redis>
+    <host>222.73.57.12</host>
+    <port>6379</port>
+    <timeOut>3000</timeOut>
+    <auth>kunyan</auth>
+    <maxConn>8</maxConn>
+    <maxIdle>4</maxIdle>
+    <maxWait>1000</maxWait>
+    <testBorrow>true</testBorrow>
+    <testReturn>true</testReturn>
+  </redis>
+</config>

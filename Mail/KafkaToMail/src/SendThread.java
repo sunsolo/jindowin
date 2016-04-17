@@ -74,7 +74,7 @@ class SendThread implements Runnable {
        * */
       } catch (AuthenticationFailedException e) {
         System.out.println(e.getMessage());
-        System.out.println("Bad user or password");
+        System.out.println("Bad sender user or password");
         return;
       } catch (AddressException e) {
         System.out.println(e.getMessage());
